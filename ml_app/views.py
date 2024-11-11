@@ -373,11 +373,11 @@ def predict_page(request):
             img.save(image_path)
             preprocessed_images.append(image_name)
         print("\n------------    Videos Splitting Done    ------------")
-        print("------------    %s seconds    ------------" % (time.time() - start_time))
+        print("--------------         %s seconds          ------------" % (time.time() - start_time))
         # End: Displaying preprocessing images
 
         # Start: Displaying Faces Cropped Images
-        print("\n------------ Started Face Cropping Each Frame ------------")
+        print("\n--------- Started Face Cropping Each Frame ----------")
         padding = 40
         faces_found = 0
         for i in range(1, sequence_length+1):
@@ -401,8 +401,8 @@ def predict_page(request):
             img.save(image_path)
             faces_found = faces_found + 1
             faces_cropped_images.append(image_name)
-        print("\n------------  Face Cropping Each Frame Done  -------------")
-        print("------------    %s seconds  ------------" % (time.time() - start_time))
+        print("\n----------  Face Cropping Each Frame Done  -------------")
+        print("------------             %s seconds          ------------" % (time.time() - start_time))
 
         # No face is detected
         if faces_found == 0:
