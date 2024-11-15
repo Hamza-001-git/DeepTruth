@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.auth',
-    'ml_app',
+    'WebApp',
 ]
 
 MIDDLEWARE = [

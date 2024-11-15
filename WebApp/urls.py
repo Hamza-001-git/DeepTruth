@@ -7,7 +7,7 @@ from .views import about, index, predict_page, video_upload_api, result, get_dat
 from project_settings import settings
 from django.conf.urls.static import static
 
-app_name = 'ml_app'
+app_name = 'WebApp'
 handler404 = views.handler404
 
 urlpatterns = [

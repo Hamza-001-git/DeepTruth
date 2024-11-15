@@ -23,7 +23,7 @@ from django.conf import settings
 from .forms import VideoUploadForm
 import datetime
 from random import choice
-
+import mimetypes
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -240,11 +240,27 @@ ALLOWED_VIDEO_EXTENSIONS = set(
 
 
 def allowed_video_file(filename):
-    # print("filename" ,filename.rsplit('.',1)[1].lower())
-    if (filename.rsplit('.', 1)[1].lower() in ALLOWED_VIDEO_EXTENSIONS):
-        return True
-    else:
+    # Check for files with multiple extensions (i.e., more than one dot in the filename)
+    if filename.count('.') > 1:
         return False
+
+    # Check for empty extension
+    if '.' not in filename:
+        return False
+
+    # Extract the last extension after the final dot
+    extension = filename.rsplit('.', 1)[-1].lower()
+
+    # Ensure extension is within the allowed list
+    if extension not in ALLOWED_VIDEO_EXTENSIONS:
+        return False
+
+    # Optionally check MIME type for additional validation
+    mime_type, _ = mimetypes.guess_type(filename)
+    if mime_type and mime_type.split('/')[0] != 'video':
+        return False
+
+    return True
 
 
 def index(request):
@@ -293,7 +309,7 @@ def index(request):
                 request.session['file_name'] = os.path.join(
                     settings.PROJECT_DIR, 'uploaded_videos', 'app', 'uploaded_videos', saved_video_file)
             request.session['sequence_length'] = sequence_length
-            return redirect('ml_app:predict')
+            return redirect('WebApp:predict')
         else:
             return render(request, index_template_name, {"form": video_upload_form})
 
@@ -314,7 +330,7 @@ def result(request):
 def predict_page(request):
     if request.method == "GET":
         if 'file_name' not in request.session:
-            return redirect("ml_app:home")
+            return redirect("WebApp:home")
         if 'file_name' in request.session:
             video_file = request.session['file_name']
         if 'sequence_length' in request.session:
@@ -442,7 +458,7 @@ def predict_page(request):
             else:
                 request.session["original_video"] = production_video_name
                 # return render(request, predict_template_name, {'preprocessed_images': preprocessed_images, 'heatmap_images': heatmap_images, "faces_cropped_images": faces_cropped_images, "original_video": production_video_name, "models_location": models_location, "output": output, "confidence": confidence, "accuracy": model_name.split("\\")[-1][6:8], "decimal": model_name.split("\\")[-1][13:15]})
-            return redirect("ml_app:result")
+            return redirect("WebApp:result")
         except Exception as e:
             print("Execption :", e.args)
             return render(request, 'cuda_full.html')
@@ -454,7 +470,6 @@ def about(request):
 
 def handler404(request, exception):
     return render(request, '404.html', status=404)
-
 
 @csrf_exempt
 def video_upload_api(request):
@@ -564,7 +579,6 @@ def run_deep_fake_detection(request):
         return {'output': 'REAL' if prediction[0] == 1 else 'FAKE', 'confidence': confidence, 'prediction': prediction[0], 'Number of frames used': sequence_length}
     except Exception as e:
         return {"Exception": e}
-
 
 def get_data(request):
     is_splitted = request.session["is_video_splitted"] if "is_video_splitted" in request.session else None
