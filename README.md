@@ -29,3 +29,6 @@ With this architecture, DeepTruth excels at analyzing both static images and dyn
 - Real-Time Detection: Upload videos to get immediate analysis results.
 - User-Friendly Interface: Intuitive design for easy navigation
 - Advanced Algorithms: Utilizes state-of-the-art deep learning models like ResNext and LSTM for high accuracy and precision in detecting Deepfakes.
+
+## Acknowledgments
+- Thanks to the developers of PyTorch, OpenCV, and face_recognition for their excellent libraries.
