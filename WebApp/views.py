@@ -203,40 +203,39 @@ def plot_heat_map(i, model, img, path='./', video_file_name=''):
     return image_name
 
 # Model Selection
-
-
 def get_accurate_model(sequence_length):
     model_name = []
     sequence_model = []
     final_model = ""
-    list_models = glob.glob(os.path.join(
-        settings.PROJECT_DIR, "models", "*.pt"))
+    list_models = glob.glob(os.path.join(settings.PROJECT_DIR, "models", "*.pt"))
 
-    for i in list_models:
-        model_name.append(i.split("\\")[-1])
+    for model_path in list_models:
+        model_name.append(os.path.basename(model_path))
 
-    for i in model_name:
+    for model_filename in model_name:
         try:
-            seq = i.split("_")[3]
-            if (int(seq) == sequence_length):
-                sequence_model.append(i)
-        except:
-            pass
+            seq = model_filename.split("_")[3]
+            if int(seq) == sequence_length:
+                sequence_model.append(model_filename)
+        except IndexError:
+            pass  # Handle cases where the filename format doesn't match expected
 
     if len(sequence_model) > 1:
         accuracy = []
-        for i in sequence_model:
-            acc = i.split("_")[1]
-            accuracy.append(acc)
+        for filename in sequence_model:
+            acc = filename.split("_")[1]
+            accuracy.append(acc)  # Convert accuracy to float for proper comparison
         max_index = accuracy.index(max(accuracy))
-        final_model = sequence_model[max_index]
+        final_model = os.path.join(settings.PROJECT_DIR, "models", sequence_model[max_index])
+    elif len(sequence_model) == 1:
+        final_model = os.path.join(settings.PROJECT_DIR, "models", sequence_model[0])
     else:
-        final_model = sequence_model[0]
+        print("No model found for the specified sequence length.")  # Handle no models found case
+
     return final_model
 
-
 ALLOWED_VIDEO_EXTENSIONS = set(
-    ['mp4', 'gif', 'webm', 'avi', '3gp', 'wmv', 'flv', 'mkv'])
+['mp4', 'gif', 'webm', 'avi', '3gp', 'wmv', 'flv', 'mkv'])
 
 
 def allowed_video_file(filename):
@@ -335,6 +334,17 @@ def predict_page(request):
             video_file = request.session['file_name']
         if 'sequence_length' in request.session:
             sequence_length = request.session['sequence_length']
+
+        # Validate frame count
+        cap = cv2.VideoCapture(video_file)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # Get total number of frames
+        cap.release()
+
+        if total_frames < sequence_length:
+            # Insufficient frames error
+            frame_error = f"The uploaded video has {total_frames} frames, but {sequence_length} frames are required."
+            return render(request, predict_template_name, {"frame_error": frame_error})
+
         path_to_videos = [video_file]
         video_file_name = video_file.split('\\')[-1]
         if settings.DEBUG == False:

@@ -113,6 +113,16 @@
         No faces detected. Cannot process the video.
     </div>
 </div>
+{% elif frame_error %}
+<div class="container">
+    <div class="logo text-center mb-3">
+        <img src="{% static 'images/logo1.png' %}" alt="Logo"/>
+    </div>
+    <hr/>
+    <div class="alert alert-danger">
+        {{ frame_error }}
+    </div>
+</div>
 {% else %}
 <div class="container">
     <div class="logo text-center mb-3">
