@@ -23,6 +23,7 @@ By addressing these pressing issues, DeepTruth empowers individuals, organizatio
 DeepTruth aims to safeguard digital authenticity by providing a reliable detection mechanism for Deepfakes. Our application combines:
 - ResNext Algorithm: For feature extraction from media content.
 - LSTM (Long Short-Term Memory): To analyze temporal sequences in video data for more accurate detection.
+
 With this architecture, DeepTruth excels at analyzing both static images and dynamic videos to flag potential Deepfake content.
 
 ## Features
